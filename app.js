@@ -5,7 +5,7 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
-const history = require('connect-history-api-fallback')
+const historyApiFallback = require('koa2-connect-history-api-fallback')
 
 const index = require('./routes/index')
 const users = require('./routes/users')
@@ -13,8 +13,10 @@ const users = require('./routes/users')
 // error handler
 onerror(app)
 
+const historyWhiteList = ['/', '/user']
+
 // middlewares
-app.use(history())
+app.use(historyApiFallback({ whiteList: historyWhiteList }))
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
 }))
