@@ -25,7 +25,18 @@ const historyWhiteList = [
 ]
 
 // middlewares
-app.use(cors())
+app.use(cors({
+  origin: function (ctx) {
+    if (ctx.header.origin.indexOf('zuiren-z.com') > -1) {
+      return "*" // 允许来自所有域名请求
+    }
+  },
+  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+  maxAge: 172800,
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'DELETE'] // 设置允许的HTTP请求类型
+  // allowHeaders: ['Content-Type', 'Authorization', 'Accept']
+}))
 app.use(historyApiFallback({ whiteList: historyWhiteList }))
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
@@ -56,9 +67,9 @@ function verifyToken(token) {
 
 // logger
 app.use(async (ctx, next) => {
-  ctx.set("Access-Control-Allow-Methods", 'get,post')
-  ctx.set("access-control-allow-credentials", true)
-  ctx.set("Access-Control-Max-Age", 172800)
+  // ctx.set("Access-Control-Allow-Methods", 'get,post')
+  // ctx.set("access-control-allow-credentials", true)
+  // ctx.set("Access-Control-Max-Age", 172800)
 
   const {url = ''} = ctx
   const data = url.split('/')
