@@ -6,7 +6,7 @@ const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 // const historyApiFallback = require('koa2-connect-history-api-fallback')
-const cors = require('koa2-cors')
+// const cors = require('koa2-cors')
 const jwt = require('jsonwebtoken')
 const fs = require('fs')
 const path = require('path')
@@ -25,18 +25,18 @@ onerror(app)
 // ]
 
 // middlewares
-app.use(cors({
-  origin: function (ctx) {
-    if (ctx.header.origin.indexOf('zuiren-z.com') > -1) {
-      return "*" // 允许来自所有域名请求
-    }
-  },
-  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
-  maxAge: 172800,
-  credentials: true,
-  allowMethods: ['GET', 'POST', 'DELETE'] // 设置允许的HTTP请求类型
-  // allowHeaders: ['Content-Type', 'Authorization', 'Accept']
-}))
+// app.use(cors({
+//   origin: function (ctx) {
+//     if (ctx.header.origin.indexOf('zuiren-z.com') > -1) {
+//       return "*" // 允许来自所有域名请求
+//     }
+//   },
+//   exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+//   maxAge: 172800,
+//   credentials: true,
+//   allowMethods: ['GET', 'POST', 'DELETE'] // 设置允许的HTTP请求类型
+//   // allowHeaders: ['Content-Type', 'Authorization', 'Accept']
+// }))
 // app.use(historyApiFallback({ whiteList: historyWhiteList }))
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
