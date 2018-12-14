@@ -68,6 +68,7 @@ function verifyToken(token) {
 // logger
 app.use(async (ctx, next) => {
   // ctx.set("Access-Control-Allow-Methods", 'get,post')
+  ctx.set("Access-Control-Allow-Origin", '*')
   // ctx.set("access-control-allow-credentials", true)
   // ctx.set("Access-Control-Max-Age", 172800)
 
