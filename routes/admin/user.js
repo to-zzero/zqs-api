@@ -6,16 +6,32 @@ const jwt = require('jsonwebtoken')
 const {tips, success} = (require('../../until')).tips
 
 // 生成token的方法
-function generateToken(data){
+function generateToken(data, exp){
   let created = Math.floor(Date.now() / 1000)
   let cert = fs.readFileSync(path.join(__dirname, '../../config/rsa_private_key.pem')) // 私钥
   let token = jwt.sign({
     data,
-    exp: created + 3600 * 24
+    exp: exp ? created : (created + 3600 * 24)
   }, cert, {
     algorithm: 'RS256'
   })
   return token
+}
+
+function verifyToken(token) {
+  let cert = fs.readFileSync(path.join(__dirname, '../../config/rsa_public_key.pem')) // 公钥
+  let res = {}
+  try {
+    let result = jwt.verify(token, cert, {algorithms: ['RS256']}) || {}
+    let {exp = 0} = result,current = Math.floor(Date.now() / 1000)
+
+    if(current <= exp){
+      res = result.data || {}
+    }
+  } catch(e){
+    console.log(e)
+  }
+  return res
 }
 
 router.prefix('/admin/user')
@@ -36,11 +52,33 @@ router.post('/login', async (ctx, next) => {
       let token = generateToken({uid: result.id})
       // console.log(token)
       ctx.body = {
-        ...result,
+        name: result.name,
+        country: result.country,
+        phone: result.phone,
+        id: result.id,
         token
       }
     }
   })
+})
+
+router.post('/login_out', async (ctx, next) => {
+  const token = ctx.header.autumntoken
+  const id = (verifyToken(token) || {}).uid
+  if (!id) {
+    ctx.body = tips[1002]
+  } else {
+    await allServers.admin.user.loginOut({
+      id
+    }).then(res => {
+      if (!res[0]) {
+        ctx.body = tips[1011]
+      } else {
+        generateToken({uid: res[0].id}, true)
+        ctx.body = success[1001]
+      }
+    })
+  }
 })
 
 router.post('/addUser', async (ctx, next) => {
@@ -75,16 +113,62 @@ router.post('/addUser', async (ctx, next) => {
   }
 })
 
+router.post('/delete_user', async (ctx, next) => {
+  const {id} = ctx.request.body
+  if (!id) {
+    ctx.body = tips[1012]
+  } else if (id === 10000) {
+    ctx.body = tips[1014]
+  } else {
+    const user = await allServers.admin.user.queryUser(id)
+    console.log(user)
+    if (!user[0]) {
+      ctx.body = tips[1011]
+    } else {
+      await allServers.admin.user.deleteUser(id).then(res => {
+        if (res.affectedRows) {
+          ctx.body = success[1002]
+        } else {
+          ctx.body = tips[1013]
+        }
+      })
+    }
+  }
+})
+
+router.post('/get_user_info', async function (ctx, next) {
+  const token = ctx.header.autumntoken
+  const id = (verifyToken(token) || {}).uid
+  if (!id) {
+    ctx.body = tips[1002]
+  } else {
+    await allServers.admin.user.getUserInfo(id).then(res => {
+      if (res.length === 0) {
+        ctx.body = tips[1010]
+      } else {
+        ctx.body = {
+          name: res[0].name,
+          country: res[0].country,
+          id: res[0].id,
+          phone: res[0].phone
+        }
+      }
+    })
+  }
+})
+
 router.post('/query_users', async function (ctx, next) {
   const {page, size} = ctx.request.body
+  // console.log(page, size)
   await allServers.admin.user.queryUsers({page, size}).then(res => {
     if (res.length === 0) {
       ctx.body = tips[1010]
     } else {
-      console.log(res)
+      // console.log(res)
       ctx.body = {
         items: res[0],
-        count: res[1][0]['count(*)']
+        count: res[1][0]['count(*)'],
+        page
       }
     }
   })

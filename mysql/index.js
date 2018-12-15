@@ -9,7 +9,6 @@ const params = {
   query: async function (sql, values) {
     return await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
-        console.log(err, 11111)
         if (err) {
           reject(err)
         }

@@ -5,7 +5,7 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
-const historyApiFallback = require('koa2-connect-history-api-fallback')
+// const historyApiFallback = require('koa2-connect-history-api-fallback')
 const cors = require('koa2-cors')
 const jwt = require('jsonwebtoken')
 const fs = require('fs')
@@ -18,11 +18,11 @@ const {tips} = require('./until/tips.js')
 // error handler
 onerror(app)
 
-const historyWhiteList = [
-  '/',
-  '/user',
-  '/admin'
-]
+// const historyWhiteList = [
+//   '/',
+//   '/user',
+//   '/admin'
+// ]
 
 // middlewares
 app.use(cors({
@@ -37,7 +37,7 @@ app.use(cors({
   allowMethods: ['GET', 'POST', 'DELETE'] // 设置允许的HTTP请求类型
   // allowHeaders: ['Content-Type', 'Authorization', 'Accept']
 }))
-app.use(historyApiFallback({ whiteList: historyWhiteList }))
+// app.use(historyApiFallback({ whiteList: historyWhiteList }))
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
 }))
