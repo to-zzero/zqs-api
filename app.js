@@ -60,6 +60,7 @@ function verifyToken(token) {
       res = result.data || {}
     }
   } catch(e){
+    res = e
     console.log(e)
   }
   return res
@@ -83,9 +84,12 @@ app.use(async (ctx, next) => {
     if (autumntoken) {
       let result = verifyToken(autumntoken)
       let {uid} = result
+      console.log(result)
       if (uid) {
         ctx.state = {uid}
         await next()
+      } else if (result.message) {
+        return ctx.body = tips[1015]
       } else {
         return ctx.body = tips[1002]
       }
