@@ -22,7 +22,7 @@ const tips = {
   1012: {code: 1012, message: '参数错误'},
   1013: {code: 1013, message: '删除失败'},
   1014: {code: 1014, message: 'root管理员 不可删除'},
-  1015: {code: 1015, message: '该账号已在别处登录'}
+  1015: {code: 1015, message: '浏览器cookie被禁用'}
 }
 
 module.exports = {

@@ -11,7 +11,7 @@ function generateToken(data, exp){
   let cert = fs.readFileSync(path.join(__dirname, '../../config/rsa_private_key.pem')) // 私钥
   let token = jwt.sign({
     data,
-    exp: exp ? created : (created + 3600 * 24)
+    exp: exp ? 0 : (created + 3600 * 1)
   }, cert, {
     algorithm: 'RS256'
   })
@@ -21,12 +21,13 @@ function generateToken(data, exp){
 function verifyToken(token) {
   let cert = fs.readFileSync(path.join(__dirname, '../../config/rsa_public_key.pem')) // 公钥
   let res = {}
+  let a = {}
   try {
     let result = jwt.verify(token, cert, {algorithms: ['RS256']}) || {}
     let {exp = 0} = result,current = Math.floor(Date.now() / 1000)
-
     if(current <= exp){
       res = result.data || {}
+      a = result
     }
   } catch(e){
     console.log(e)
@@ -74,7 +75,7 @@ router.post('/login_out', async (ctx, next) => {
       if (!res[0]) {
         ctx.body = tips[1011]
       } else {
-        generateToken({uid: res[0].id}, true)
+        const token = generateToken({uid: res[0].id}, true)
         ctx.body = success[1001]
       }
     })
@@ -121,7 +122,7 @@ router.post('/delete_user', async (ctx, next) => {
     ctx.body = tips[1014]
   } else {
     const user = await allServers.admin.user.queryUser(id)
-    console.log(user)
+    // console.log(user)
     if (!user[0]) {
       ctx.body = tips[1011]
     } else {

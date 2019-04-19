@@ -88,8 +88,8 @@ app.use(async (ctx, next) => {
       if (uid) {
         ctx.state = {uid}
         await next()
-      } else if (result.message) {
-        return ctx.body = tips[1015]
+      } else if (result.message.name === 'TokenExpiredError') {
+        return ctx.body = tips[1002]
       } else {
         return ctx.body = tips[1002]
       }
